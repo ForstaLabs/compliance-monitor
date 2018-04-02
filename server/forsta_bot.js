@@ -5,6 +5,7 @@
 const BotAtlasClient = require("./atlas_client");
 const cache = require("./cache");
 const relay = require("librelay");
+const natural = require('natural');
 const PGStore = require("./pgstore");
 const uuid4 = require("uuid/v4");
 const uuid5 = require("uuid/v5");
@@ -146,8 +147,35 @@ class ForstaBot {
             if (!directions.includes(trigger.def.direction)) continue;
             const matchText = trigger.def.dflag ? dtext : text;
             const match = (text && trigger.compiledRegex.exec(matchText));
-            if (match) await this.flagMessage({senderId, sender, distribution, recipientIds, recipients, received, message, trigger, match, text});
+            if (match) {
+                const skip = trigger.classifier.docs.length && trigger.classifier.classify(matchText) === 'skip';
+                if (!skip) {
+                    trigger.classifier.addDocument(matchText, 'flag');
+                    trigger.classifier.train();
+                    console.log(`added training to ${trigger.label}`, trigger.classifier);
+                    await this.updatePersistedClassifier(trigger);
+                    await this.flagMessage({senderId, sender, distribution, recipientIds, recipients, received, message, trigger, match, text});
+                } else {
+                    console.log('overriding match hit for', directions, text);
+                }
+            }
         }
+    }
+
+    async updatePersistedClassifier(trigger) {
+        await this.updateTrigger({
+            id: trigger.id, 
+            state: trigger.state, 
+            label: trigger.def.label, 
+            direction: trigger.def.direction, 
+            type: trigger.def.type, 
+            pattern: trigger.def.pattern, 
+            iflag: trigger.def.iflag, 
+            dflag: trigger.def.dflag, 
+            notify: trigger.def.notify, 
+            userId: trigger.def.userId, 
+            classifier: trigger.classifier, 
+            reload: false});
     }
 
     async processComment({memo, threadId, senderId, sender, distribution, recipientIds, recipients, received, message, text}) {
@@ -198,21 +226,33 @@ class ForstaBot {
     }
 
     async upvote({distribution, memo, threadId}) {
+        console.log('upvote');
         this.msgSender.send({
             distribution,
             threadTitle: memo.notificationThreadTitle,
             threadId,
             text: `Thanks for the feedback to notify of future messages like this.`
         });
+        memo.trigger.classifier.removeDocument(memo.text, 'skip');
+        memo.trigger.classifier.addDocument(memo.text, 'flag');
+        memo.trigger.classifier.retrain();
+        console.log(`upvote training to ${memo.trigger.label}`, memo.trigger.classifier);
+        await this.updatePersistedClassifier(memo.trigger);
     }
 
     async downvote({distribution, memo, threadId}) {
+        console.log('downvote');
         this.msgSender.send({
             distribution,
             threadTitle: memo.notificationThreadTitle,
             threadId,
             text: `Thanks for the feedback to ignore future messages like this.`
         });
+        memo.trigger.classifier.removeDocument(memo.text, 'flag');
+        memo.trigger.classifier.addDocument(memo.text, 'skip');
+        memo.trigger.classifier.retrain();
+        console.log(`downvote training to ${memo.trigger.label}`, memo.trigger.classifier);
+        await this.updatePersistedClassifier(memo.trigger);
     }
 
     async sendHelp({distribution, memo, threadId}) {
@@ -506,7 +546,7 @@ down/bad/less/noise/no/etc. -- training feedback to ignore messages like this on
         await this.loadTriggers();
         return result;
     }
-    async updateTrigger({id, state, label, direction, type, pattern, iflag, dflag, notify, userId: creatorId}) {
+    async updateTrigger({id, state, label, direction, type, pattern, iflag, dflag, notify, userId: creatorId, classifier, reload=true}) {
         const [pretty, universal] = await this.resolve(notify);
         const result = await this.pgStore.updateTrigger({id, state, def: {
             label,
@@ -517,9 +557,10 @@ down/bad/less/noise/no/etc. -- training feedback to ignore messages like this on
             dflag,
             notify: pretty,
             notifyUniversal: universal,
-            creatorId
+            creatorId,
+            classifier
         }});
-        await this.loadTriggers();
+        if (reload) await this.loadTriggers();
         return result;
     }
 
@@ -528,6 +569,13 @@ down/bad/less/noise/no/etc. -- training feedback to ignore messages like this on
         this.triggers.forEach(t => {
             const regex = t.type === 'regex' ? t.def.pattern : terms2regex(t.def.pattern);
             t.compiledRegex = new RegExp(regex, t.def.iflag ? 'i' : '');
+            if (t.def.classifier) {
+                t.classifier = natural.BayesClassifier.restore(t.def.classifier); 
+                console.log(`restored existing classifier for ${t.label}`, t.classifier);
+            } else {
+                t.classifier = new natural.BayesClassifier();
+                console.log(`added new classifier for ${t.label}`, t.classifier);
+            }
         });
         console.log('(re)loaded triggers');
     }
