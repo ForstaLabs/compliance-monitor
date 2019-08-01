@@ -1,20 +1,14 @@
 Forsta Compliance Monitor
 ========
-This is a bot that performs secure autonomous monitoring of 
-an entire organization's messaging traffic, watching for messages
-that should be flagged and forwarded to an interested official
-in the organization.
-
-This is a descendant of the [Forsta Message Vault](https://github.com/ForstaLabs/compliance-monitor) 
-codebase, which you can use for secure message receipt, processing, storage, and/or transmission 
-on the Forsta messaging platform.
+This repository is built from Forsta's [end-to-end-encrypted messaging bot template](https://github.com/ForstaLabs/messaging-bot).
+The Forsta messaging-bot provides for for autonomous receipt, processing, storage, and
+transmission of messaging data in conjunction with the Forsta web messenger and iPhone/Android apps.
+Please fork it or one of our several projects based off of it!
 
 Please see the [CHANGELOG](https://github.com/ForstaLabs/compliance-monitor/blob/master/CHANGELOG.md)
-for the current set of features!
+for the current set of features.
 
-[![NPM](https://img.shields.io/npm/v/forsta-compliance-monitor.svg)](https://www.npmjs.com/package/forsta-compliance-monitor)
 [![Change Log](https://img.shields.io/badge/change-log-blue.svg)](https://github.com/ForstaLabs/compliance-monitor/blob/master/CHANGELOG.md)
-[![License](https://img.shields.io/npm/l/forsta-compliance-monitor.svg)](https://github.com/ForstaLabs/compliance-monitor)
 
 
 The Why &mdash; Decentralized Data Security

@@ -106,6 +106,7 @@ class ForstaBot {
 
 
     async onMessage(ev) {
+        console.log('message recieved');
         const received = new Date(ev.data.timestamp);
         const envelope = JSON.parse(ev.data.message.body);
         const message = envelope.find(x => x.version === 1);
@@ -227,6 +228,7 @@ down/bad/less/noise/no/etc. -- training feedback to ignore messages like this on
 
 
     async flagMessage({senderId, sender, distribution, recipientIds, recipients, received, message, trigger, match, text}) {
+        console.log('message flagged !');
         const senderLabel = this.fqLabel(sender);
         const recipientLabels = recipients.map(user => this.fqLabel(user));
 
