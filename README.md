@@ -1,6 +1,6 @@
 Forsta Compliance Monitor
 ========
-This repository is built from Forsta's [end-to-end-encrypted messaging bot template](https://github.com/ForstaLabs/messaging-bot).
+This repository is built from Forsta's [end-to-end-encrypted messaging bot template](https://github.com/ForstaLabs/forsta-messaging-bot).
 The Forsta messaging-bot provides for for autonomous receipt, processing, storage, and
 transmission of messaging data in conjunction with the Forsta web messenger and iPhone/Android apps.
 Please fork it or one of our several projects based off of it!
@@ -8,7 +8,7 @@ Please fork it or one of our several projects based off of it!
 Please see the [CHANGELOG](https://github.com/ForstaLabs/compliance-monitor/blob/master/CHANGELOG.md)
 for the current set of features.
 
-[![Change Log](https://img.shields.io/badge/change-log-blue.svg)](https://github.com/ForstaLabs/compliance-monitor/blob/master/CHANGELOG.md)
+[![Change Log](https://img.shields.io/badge/change-log-blue.svg)](https://github.com/ForstaLabs/forsta-compliance-monitor/blob/master/CHANGELOG.md)
 
 
 The Why &mdash; Decentralized Data Security
@@ -50,7 +50,7 @@ Quick Start
 These deployment buttons can be used to validate that this compliance monitor
 will meet your organizations needs with as little setup pain as possible.  
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ForstaLabs/compliance-monitor)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ForstaLabs/forsta-compliance-monitor)
 [![Deploy to Docker Cloud](https://files.cloud.docker.com/images/deploy-to-dockercloud.svg)](https://cloud.docker.com/stack/deploy/)
 
 
@@ -81,7 +81,7 @@ Developer Install
 If you want to extend the Forsta Compliance Monitor or just get closer to the code, 
 you can install and run directly from the source code:
 
-    git clone https://github.com/ForstaLabs/compliance-monitor.git
+    git clone https://github.com/ForstaLabs/forsta-compliance-monitor.git
     cd compliance-monitor
     make
     npm start
